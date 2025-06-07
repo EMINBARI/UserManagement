@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using UserManagement.Core.Interfaces;
 using UserManagement.Core.ValueObjects;
 
 namespace UserManagement.Core.Models
 {
-    public class User
+    public class User: IEntity
     {
         public Guid Id { get; set; }
         public Username Username { get; set; }
