@@ -3,19 +3,15 @@
 
 namespace UserManagement.Infrastructure.Postgres
 {
-    internal class PostgresContext: DbContext
+    public class PostgresContext: DbContext
     {
         public PostgresContext(DbContextOptions<PostgresContext> options): base(options) { }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnConfiguring(optionsBuilder);
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(PostgresContext).Assembly);
+            base.OnModelCreating(builder);
+            builder.HasDefaultSchema("usermanagement");
+            builder.ApplyConfigurationsFromAssembly(typeof(PostgresContext).Assembly);
 
         }
 

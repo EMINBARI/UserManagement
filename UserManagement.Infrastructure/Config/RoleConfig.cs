@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UserManagement.Core.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace UserManagement.Infrastructure.Config
 {
     public class RoleConfig : IEntityTypeConfiguration<Role>
     {
-        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<Role> builder)
+        public void Configure(EntityTypeBuilder<Role> builder)
         {
             builder.HasKey(r => r.Id);
 

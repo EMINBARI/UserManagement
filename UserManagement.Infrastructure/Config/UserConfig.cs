@@ -10,7 +10,7 @@ namespace UserManagement.Infrastructure.Config
         {
             builder.HasKey(u => u.Id);
 
-            builder.HasOne(u => u.Username);
+            builder.OwnsOne(u => u.Username);
 
             builder.Property(u => u.Email)
                 .IsRequired();
