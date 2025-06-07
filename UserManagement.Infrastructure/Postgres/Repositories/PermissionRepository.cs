@@ -5,7 +5,7 @@ using UserManagement.Infrastructure.Abstractions;
 
 namespace UserManagement.Infrastructure.Postgres.Repositories;
 
-public class UserRepository: GenericRepository<User>, IUserRepository
+public class PermissionRepository: GenericRepository<Permission>,IPermissionRepository
 {
-    public UserRepository(PostgresContext context) : base(context) { }
+    public PermissionRepository(DbContext context) : base(context) { }
 }
