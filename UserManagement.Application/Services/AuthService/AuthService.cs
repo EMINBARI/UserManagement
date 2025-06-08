@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using UserManagement.Application.Contracts.AuthContracts.Requests;
@@ -47,6 +48,7 @@ public class AuthService: IAuthService
         }
         
         var passwordHash = _passwordHasher.Generate(request.Password);
+        
         var username = new Username
         {
             First = request.FirstName, 
@@ -68,27 +70,37 @@ public class AuthService: IAuthService
     }
     
     
-    public async Task<AuthResponse?> LoginAsync(LoginUserRequest request)
+    public async Task<Result<AuthResponse>> LoginAsync(LoginUserRequest request)
     {
         var user = await _userRepository.GetByEmailAsync(request.Email);
 
-        if (user != null && _passwordHasher.Verify(user.PasswordHash, request.Password))
+        if (user != null && _passwordHasher.Verify(
+                providedPassword: request.Password, 
+                hashedPassword: user.PasswordHash))
+            
             return await CreateAuthResponse(user);
 
-        return null;
+        return Result.Failure<AuthResponse>("Invalid credentials.");
     }
-
-    public async Task<AuthResponse?> UpdateTokensAsync(UpdateTokensRequest request)
+    
+    public async Task<Result<AuthResponse>> RefreshAsync(RefreshTokensRequest request)
     {
         var user = await ValidateRefreshToken(request.UserId, request.RefreshToken);
 
-        if (user != null)
-            return await CreateAuthResponse(user);
+        if (user == null) return Result.Failure<AuthResponse>("Invalid refresh token.");
         
-        return null;
+        var response = await _refreshTokenRepository.RevokeAsync(
+            userId: request.UserId,
+            refreshToken: request.RefreshToken, 
+            CancellationToken.None);
+        
+        if (response.IsFailure) return Result.Failure<AuthResponse>(response.Error);
+        
+        return await CreateAuthResponse(user);
     }
     
     
+    //Impl
     private async Task<User?> ValidateRefreshToken(Guid userId, string refreshToken)
     {
         var user = await _userRepository.GetAsync(userId, CancellationToken.None);
@@ -99,8 +111,10 @@ public class AuthService: IAuthService
             .SingleOrDefault(t => t.Token == refreshToken);
             
         if (user is null || 
-            refreshTokenEntry is null || 
-            refreshTokenEntry.ExpiresAt <= DateTimeOffset.UtcNow)
+            refreshTokenEntry is null ||
+            refreshTokenEntry.IsRevoked ||
+            refreshTokenEntry.ExpiresAt <= DateTimeOffset.UtcNow 
+            )
         {
             return null;
         }
@@ -119,6 +133,7 @@ public class AuthService: IAuthService
     }
 
     
+    //IMpl
     private async Task<RefreshToken> GenerateAndSaveRefreshTokenAsync(User user)
     {
         var tokenValue = GenerateRefreshToken();
@@ -132,6 +147,7 @@ public class AuthService: IAuthService
         return refreshTokenEntity;
     }
     
+    //Impl
     private string GenerateRefreshToken()
     {
         var randomNumber = new byte[32];
@@ -140,6 +156,7 @@ public class AuthService: IAuthService
         return Convert.ToBase64String(randomNumber);
     }
     
+    //Implemented 
     private string CreateAccessToken(User user)
     {
         var claims = new List<Claim>
