@@ -21,10 +21,10 @@ public class AuthController: ControllerBase
     {
         var response = await _authService.LoginAsync(request);
 
-        if (response is null)
-            return BadRequest("Invalid username or password.");
+        if (response.IsFailure)
+            return BadRequest(response.Error);
         
-        return Ok(response);
+        return Ok(response.Value);
     }
 
     [HttpPost("register")]
@@ -36,5 +36,16 @@ public class AuthController: ControllerBase
             return BadRequest(response.Message);
         
         return Ok(response);
+    }
+
+    [HttpPost("refresh")]
+    public async Task<ActionResult<AuthResponse>> RefreshToken([FromBody] RefreshTokensRequest request)
+    {
+        var response = await _authService.RefreshAsync(request);
+
+        if (response.IsFailure)
+            return BadRequest(response.Error);
+        
+        return Ok(response.Value);
     }
 }
