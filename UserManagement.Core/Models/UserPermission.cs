@@ -2,7 +2,7 @@ using UserManagement.Core.Interfaces;
 
 namespace UserManagement.Core.Models;
 
-public class UserPermissions: IEntity
+public class UserPermission: IEntity
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
