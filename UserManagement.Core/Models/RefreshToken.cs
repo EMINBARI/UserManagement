@@ -9,7 +9,9 @@ public class RefreshToken: IEntity
     public string Token { get; set; }
     public DateTimeOffset CreatedAt { get; } = DateTimeOffset.UtcNow;
     public DateTimeOffset ExpiresAt { get; init; }
-    public DateTimeOffset RevokedAt { get; init; }
+    
+    public bool IsRevoked { get; set; } = false;
+    public DateTimeOffset RevokedAt { get; set; }
     
     public User User { get; init; }
 
