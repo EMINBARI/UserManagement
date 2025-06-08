@@ -1,4 +1,5 @@
-﻿using UserManagement.Core.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using UserManagement.Core.Interfaces;
 using UserManagement.Core.ValueObjects;
 
 namespace UserManagement.Core.Models
@@ -11,8 +12,16 @@ namespace UserManagement.Core.Models
         public string PasswordHash { get; set; }
         public DateTimeOffset CreatedAt { get; } = DateTimeOffset.UtcNow;
         public DateTimeOffset UpdatedAt { get; private set; }
-
-        public User() { }
-
+        
+        public User () {}
+        public User(Username username, string email, string passwordHash)
+        {
+            Id = Guid.NewGuid();
+            Username = username;
+            Email = email;
+            PasswordHash = passwordHash;
+            UpdatedAt = DateTimeOffset.UtcNow;
+        }
+        
     }
 }
