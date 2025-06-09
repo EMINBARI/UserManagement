@@ -1,10 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using UserManagement.Application.Contracts.AuthContracts.Requests;
 using UserManagement.Application.Contracts.AuthContracts.Responses;
 using UserManagement.Core.Models;
@@ -57,7 +51,7 @@ public class AuthService(
     {
         var user = await userRepository.GetByEmailAsync(request.Email);
         
-        if(user == null || passwordHasher.Verify(request.Password, user.PasswordHash))
+        if(user == null || !passwordHasher.Verify(request.Password, user.PasswordHash))
             return Result.Failure<AuthResponse>("Invalid credentials.");
 
         return await CreateAuthResponse(user);

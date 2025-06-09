@@ -9,7 +9,7 @@ namespace UserManagement.Core.Models
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public string Description { get; set; }
-        public DateTimeOffset Timestamp { get; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
         public string IPAddress { get; set; }
 
         public User User { get; set; }

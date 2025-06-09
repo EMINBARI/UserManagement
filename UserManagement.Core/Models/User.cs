@@ -10,8 +10,8 @@ namespace UserManagement.Core.Models
         public Username Username { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
-        public DateTimeOffset CreatedAt { get; } = DateTimeOffset.UtcNow;
-        public DateTimeOffset UpdatedAt { get; private set; }
+        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset UpdatedAt { get; set; }
         
         public User () {}
         public User(Username username, string email, string passwordHash)
