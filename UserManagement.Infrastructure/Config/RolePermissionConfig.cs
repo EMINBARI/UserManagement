@@ -8,7 +8,7 @@ public class RolePermissionConfig: IEntityTypeConfiguration<RolePermission>
 {
     public void Configure(EntityTypeBuilder<RolePermission> builder)
     {
-        builder.HasKey(rp => rp.Id);
+        builder.HasKey(rp => new { rp.PermissionId, rp.RoleId });
         
         builder.HasOne(rp => rp.Role)
             .WithMany()
