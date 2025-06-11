@@ -1,12 +1,17 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+
 using UserManagement.Application.Services.AuthService;
 using UserManagement.Core.Repositories;
 using UserManagement.Infrastructure;
+using UserManagement.Infrastructure.Authorization;
+using UserManagement.Infrastructure.Authorization.Enums;
 using UserManagement.Infrastructure.Postgres;
 using UserManagement.Infrastructure.Postgres.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,12 +42,30 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Read", 
+        policy => policy.AddRequirements(new PermissionRequirement(
+            [PermissionCategory.Read])));
+    options.AddPolicy("Write",
+        policy => policy.AddRequirements(new PermissionRequirement(
+            [PermissionCategory.Write])));
+});
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 var app = builder.Build();
 
@@ -55,8 +78,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+

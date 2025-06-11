@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using UserManagement.Infrastructure.Authorization.Configuration;
 
 namespace UserManagement.Infrastructure.Postgres;
 
@@ -22,13 +20,7 @@ public class DesignTimeFactory: IDesignTimeDbContextFactory<PostgresContext>
         
         var connectionString = configurationBuilder.GetConnectionString("PostgresDatabase");
         builder.UseNpgsql(connectionString);
-
-        var authorizationOptions = new RolePermissionsOptions();
-        configurationBuilder
-            .GetSection(nameof(RolePermissionsOptions))
-            .Bind(authorizationOptions);
-        var optionsWrapper = Options.Create(authorizationOptions);
         
-        return new PostgresContext(builder.Options, optionsWrapper);
+        return new PostgresContext(builder.Options);
     }
 }
