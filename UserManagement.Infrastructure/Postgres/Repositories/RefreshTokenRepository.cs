@@ -6,15 +6,11 @@ using UserManagement.Infrastructure.Abstractions;
 
 namespace UserManagement.Infrastructure.Postgres.Repositories;
 
-public class RefreshTokenRepository: GenericRepository<RefreshToken>, IRefreshTokenRepository
+public class RefreshTokenRepository(PostgresContext context)
+    : GenericRepository<RefreshToken>(context), IRefreshTokenRepository
 {
-    private readonly DbContext _context;
+    private readonly DbContext _context = context;
 
-    public RefreshTokenRepository(PostgresContext context) : base(context)
-    {
-        _context = context;
-    }
-    
     public async Task<IEnumerable<RefreshToken>> GetUserTokensAsync(
         Guid userId, 
         CancellationToken cancellationToken)

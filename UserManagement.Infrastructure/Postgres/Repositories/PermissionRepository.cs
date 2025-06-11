@@ -7,5 +7,5 @@ namespace UserManagement.Infrastructure.Postgres.Repositories;
 
 public class PermissionRepository: IPermissionRepository
 {
-    public PermissionRepository(DbContext context)  { }
+    
 }

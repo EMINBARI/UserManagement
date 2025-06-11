@@ -6,8 +6,5 @@ namespace UserManagement.Infrastructure.Postgres.Repositories;
 
 public class RoleRepository: IRoleRepository
 {
-    public RoleRepository(PostgresContext context)
-    {
-        
-    }
+    
 }
