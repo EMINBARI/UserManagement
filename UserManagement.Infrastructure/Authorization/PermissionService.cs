@@ -20,12 +20,10 @@ public class PermissionService : IPermissionService
     {
         var userRoles = await _userRoleRepository.GetUserRolesAsync(userId);
         var permissions = new HashSet<PermissionCategory>();
-        foreach (var role in userRoles)
-        {
-            var res = await _rolePermissionRepository.GetAsync(role.Id);
-            permissions.UnionWith(res.Select(p => (PermissionCategory)p.Id).ToHashSet());
-        }
-
+ 
+        var res = await _rolePermissionRepository.GetAsync(userRoles.Select(u => u.Id).ToList());
+        permissions.UnionWith(res.Select(p => (PermissionCategory)p.Id).ToHashSet());
+        
         return permissions;
     }
 }
