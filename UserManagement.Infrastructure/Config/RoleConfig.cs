@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UserManagement.Core.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using UserManagement.Core.Enums;
+using UserManagement.Infrastructure.Authorization.Enums;
 
 namespace UserManagement.Infrastructure.Config
 {
