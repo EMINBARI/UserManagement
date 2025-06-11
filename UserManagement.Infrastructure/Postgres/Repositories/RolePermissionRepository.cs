@@ -8,12 +8,19 @@ public class RolePermissionRepository(PostgresContext context): IRolePermissionR
 {
     public async Task<IEnumerable<Permission>> GetAsync(int roleId)
     {
-        var permissions = await context.Set<RolePermission>()
+        return await context.Set<RolePermission>()
             .Include(rp => rp.Role)
             .Where(rp => rp.RoleId == roleId)
             .Select(rp => rp.Permission)
             .ToListAsync();
-        
-        return permissions;
+    }
+
+    public async Task<IEnumerable<Permission>> GetAsync(List<int> roleIds)
+    {
+        return await context.Set<RolePermission>()
+            .Include(rp => rp.Role)
+            .Where(rp => roleIds.Contains(rp.RoleId))
+            .Select(rp => rp.Permission)
+            .ToListAsync();
     }
 }
