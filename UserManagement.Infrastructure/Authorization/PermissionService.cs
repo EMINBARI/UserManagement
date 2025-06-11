@@ -18,7 +18,7 @@ public class PermissionService : IPermissionService
 
     public async Task<HashSet<PermissionCategory>> GetPermissionsAsync(Guid userId)
     {
-        var userRoles = await _userRoleRepository.GetUserRolesAsync(userId);
+        var userRoles = await _userRoleRepository.GetUserRolesAsync(userId, CancellationToken.None);
         var permissions = new HashSet<PermissionCategory>();
  
         var res = await _rolePermissionRepository.GetAsync(userRoles.Select(u => u.Id).ToList());
