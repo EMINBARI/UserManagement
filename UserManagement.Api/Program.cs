@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
+using UserManagement.Api.Extensions;
 using UserManagement.Application.Services.AuthService;
 using UserManagement.Core.Repositories;
 using UserManagement.Infrastructure;
@@ -26,32 +26,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PostgresContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDatabase")));
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["AppSettings:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["AppSettings:Audience"],
-            ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:SecureKey"]!)),
-            ValidateIssuerSigningKey = true
-        };
-    });
-
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("Read", 
-        policy => policy.AddRequirements(new PermissionRequirement(
-            [PermissionCategory.Read])));
-    options.AddPolicy("Write",
-        policy => policy.AddRequirements(new PermissionRequirement(
-            [PermissionCategory.Write])));
-});
+builder.Services.ConfigureAuthentificationService(builder.Configuration);
+builder.Services.ConfigureAuthorizationService();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
