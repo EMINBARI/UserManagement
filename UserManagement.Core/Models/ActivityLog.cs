@@ -6,7 +6,7 @@ namespace UserManagement.Core.Models
     {
         public const int MAX_DESCRIPTION_LENGTH = 256;
 
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public Guid UserId { get; set; }
         public string Description { get; set; }
         public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
@@ -15,5 +15,13 @@ namespace UserManagement.Core.Models
         public User User { get; set; }
 
         public ActivityLog() { }
+
+        public ActivityLog(Guid userId, string description, string ipAddress)
+        {
+            UserId = userId;
+            Description = description;
+            IPAddress = ipAddress;
+        }
+        
     }
 }
