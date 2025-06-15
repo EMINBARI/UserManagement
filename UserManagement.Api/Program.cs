@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using UserManagement.Api.Extensions;
+using UserManagement.Application.Services.ActivityLogService;
 using UserManagement.Application.Services.AuthService;
 using UserManagement.Core.Repositories;
 using UserManagement.Infrastructure;
@@ -43,6 +44,9 @@ builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
+builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
+builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -54,8 +58,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ActivityLoggerMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

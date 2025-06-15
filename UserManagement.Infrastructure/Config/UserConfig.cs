@@ -11,10 +11,14 @@ namespace UserManagement.Infrastructure.Config
             builder.HasKey(u => u.Id);
 
             builder.OwnsOne(u => u.Username);
-
-            builder.Property(u => u.Email)
-                .IsRequired();
-
+            
+            builder.OwnsOne(u => u.Email, email =>
+            {
+                email.Property(e => e.Value)
+                    .HasColumnName("Email")
+                    .IsRequired();
+            });
+            
             builder.Property(u => u.PasswordHash)
                 .IsRequired();
         }

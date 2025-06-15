@@ -11,9 +11,8 @@ public class UserRepository(PostgresContext context) : GenericRepository<User>(c
     {
         var user = await context.Set<User>()
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == email);
+            .FirstOrDefaultAsync(u => u.Email.Value == email);
         
         return user;
     }
-    
 }

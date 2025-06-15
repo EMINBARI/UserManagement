@@ -13,3 +13,4 @@ namespace UserManagement.Infrastructure.Postgres
         }
     }
 }
+ 
