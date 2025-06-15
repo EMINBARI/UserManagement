@@ -20,7 +20,7 @@ public class DesignTimeFactory: IDesignTimeDbContextFactory<PostgresContext>
         
         var connectionString = configurationBuilder.GetConnectionString("PostgresDatabase");
         builder.UseNpgsql(connectionString);
-
+        
         return new PostgresContext(builder.Options);
     }
 }

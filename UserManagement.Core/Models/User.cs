@@ -8,7 +8,7 @@ namespace UserManagement.Core.Models
     {
         public Guid Id { get; set; }
         public Username Username { get; set; }
-        public string Email { get; set; }
+        public Email Email { get; set; }
         public string PasswordHash { get; set; }
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset UpdatedAt { get; set; }
@@ -18,7 +18,7 @@ namespace UserManagement.Core.Models
         {
             Id = Guid.NewGuid();
             Username = username;
-            Email = email;
+            Email = Email.Create(email);
             PasswordHash = passwordHash;
             UpdatedAt = DateTimeOffset.UtcNow;
         }

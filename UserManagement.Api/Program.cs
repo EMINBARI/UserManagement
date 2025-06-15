@@ -1,12 +1,18 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using UserManagement.Api.Extensions;
+using UserManagement.Application.Services.ActivityLogService;
 using UserManagement.Application.Services.AuthService;
 using UserManagement.Core.Repositories;
 using UserManagement.Infrastructure;
+using UserManagement.Infrastructure.Authorization;
+using UserManagement.Infrastructure.Authorization.Enums;
 using UserManagement.Infrastructure.Postgres;
 using UserManagement.Infrastructure.Postgres.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,21 +27,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PostgresContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDatabase")));
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["AppSettings:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["AppSettings:Audience"],
-            ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:SecureKey"]!)),
-            ValidateIssuerSigningKey = true
-        };
-    });
+builder.Services.ConfigureAuthentificationService(builder.Configuration);
+builder.Services.ConfigureAuthorizationService();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -43,6 +36,16 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
+builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 
 var app = builder.Build();
 
@@ -55,8 +58,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ActivityLoggerMiddleware>();
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
 app.Run();
+

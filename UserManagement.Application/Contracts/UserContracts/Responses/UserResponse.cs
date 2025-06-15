@@ -14,6 +14,6 @@ public record UserResponse
         Id = user.Id;
         FirstName = user.Username.First;
         LastName = user.Username.Last;
-        Email = user.Email;
+        Email = user.Email.Value;
     }
 }

@@ -5,7 +5,9 @@ using UserManagement.Infrastructure.Abstractions;
 
 namespace UserManagement.Infrastructure.Postgres.Repositories;
 
-public class PermissionRepository: IPermissionRepository
+public class ActivityLogRepository: GenericRepository<ActivityLog>, IActivityLogRepository
 {
-    
+    public ActivityLogRepository(PostgresContext context) : base(context)
+    {
+    }
 }

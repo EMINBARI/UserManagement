@@ -53,12 +53,11 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("UserManagement.Core.Models.Permission", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -73,12 +72,39 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasMaxLength(36)
                         .HasColumnType("character varying(36)");
 
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.HasKey("Id");
 
                     b.ToTable("Permission", "usermanagement");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Some Read description",
+                            IsEnabled = true,
+                            Name = "Read"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Some Write description",
+                            IsEnabled = true,
+                            Name = "Write"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Some Update description",
+                            IsEnabled = true,
+                            Name = "Update"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Some Delete description",
+                            IsEnabled = true,
+                            Name = "Delete"
+                        });
                 });
 
             modelBuilder.Entity("UserManagement.Core.Models.RefreshToken", b =>
@@ -112,9 +138,11 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("UserManagement.Core.Models.Role", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -129,23 +157,31 @@ namespace UserManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role", "usermanagement");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Some Admin description",
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Some User description",
+                            Name = "User"
+                        });
                 });
 
             modelBuilder.Entity("UserManagement.Core.Models.RolePermission", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("PermissionId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PermissionId");
+                    b.HasKey("PermissionId", "RoleId");
 
                     b.HasIndex("RoleId");
 
@@ -160,10 +196,6 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -183,8 +215,8 @@ namespace UserManagement.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("PermissionId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -204,8 +236,8 @@ namespace UserManagement.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -262,6 +294,24 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("UserManagement.Core.Models.User", b =>
                 {
+                    b.OwnsOne("UserManagement.Core.ValueObjects.Email", "Email", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("Email");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("User", "usermanagement");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
                     b.OwnsOne("UserManagement.Core.ValueObjects.Username", "Username", b1 =>
                         {
                             b1.Property<Guid>("UserId")
@@ -282,6 +332,9 @@ namespace UserManagement.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
                         });
+
+                    b.Navigation("Email")
+                        .IsRequired();
 
                     b.Navigation("Username")
                         .IsRequired();

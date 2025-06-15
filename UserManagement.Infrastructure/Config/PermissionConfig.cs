@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using UserManagement.Core.Models;
+using UserManagement.Infrastructure.Authorization.Enums;
 
 namespace UserManagement.Infrastructure.Config;
 
@@ -15,7 +16,18 @@ public class PermissionConfig : IEntityTypeConfiguration<Permission>
             .IsRequired();
         
         builder.Property(p => p.Description)
-            .HasMaxLength(Permission.MAX_DESCRIPTION_LENGTH)
-            .IsRequired();
+            .HasMaxLength(Permission.MAX_DESCRIPTION_LENGTH);
+
+        
+        var permissions = Enum
+            .GetValues<PermissionCategory>()
+            .Select(p => new Permission
+            {
+                Id = (int)p,
+                Name = p.ToString(),
+                Description = $"Some {p.ToString()} description"
+            });
+        
+        builder.HasData(permissions);
     }
 }
